@@ -34,12 +34,14 @@ namespace EldenRingFPSUnlockAndMore
         internal long _offset_camrotation = 0x0;
         internal long _offset_camreset = 0x0;
         internal long _offset_timescale = 0x0;
+        internal long _offset_longanimations = 0x0;
 
         internal byte[] _patch_hertzlock_disable;
         internal byte[] _patch_resolution_enable;
         internal byte[] _patch_resolution_disable;
         internal byte[] _patch_deathpenalty_disable;
         internal byte[] _patch_camrotation_disable;
+        internal byte[] _patch_longanimation_disable;
 
         internal bool _codeCave_fovmultiplier = false;
         internal const string _DATACAVE_FOV_MULTIPLIER = "dfovMultiplier";
@@ -475,6 +477,17 @@ namespace EldenRingFPSUnlockAndMore
             if (!IsValidAddress(_offset_camreset))
                 _offset_camreset = 0x0;
 
+            _offset_longanimations = patternScan.FindPattern(GameData.PATTERN_LONGANIMATION_LOCKON) + GameData.PATTERN_LONGANIMATION_LOCKON_OFFSET;
+            Debug.WriteLine($"long animation found at: 0x{_offset_longanimations:X}");
+            if (!IsValidAddress(_offset_longanimations))
+                _offset_longanimations = 0x0;
+            else
+            {
+                _patch_longanimation_disable = new byte[GameData.PATCH_LONGANIMATION_INSTRUCTION_LENGTH];
+                if (!WinAPI.ReadProcessMemory(_gameAccessHwndStatic, _offset_longanimations, _patch_longanimation_disable, GameData.PATCH_LONGANIMATION_INSTRUCTION_LENGTH, out _))
+                    _offset_longanimations = 0x0;
+            }
+            
             patternScan.Dispose();
         }
 
@@ -537,6 +550,12 @@ namespace EldenRingFPSUnlockAndMore
                 UpdateStatus("time scale not found...", Brushes.Red);
                 LogToFile("time scale not found...");
                 cbGameSpeed.IsEnabled = false;
+            }
+
+            if (_offset_longanimations == 0x0)
+            {
+                UpdateStatus("long animation not found...", Brushes.Red);
+                LogToFile("long animation not found...");
             }
 
             bPatch.IsEnabled = true;
@@ -616,7 +635,8 @@ namespace EldenRingFPSUnlockAndMore
                 PatchCamRotation(),
                 PatchCamReset(),
                 PatchDeathPenalty(),
-                PatchGameSpeed()
+                PatchGameSpeed(),
+                PatchLongAnimations()
             };
             if (results.Contains(true))
                 UpdateStatus("game patched!", Brushes.Green);
@@ -768,6 +788,22 @@ namespace EldenRingFPSUnlockAndMore
             else if (cbCamLockReset.IsChecked == false)
             {
                 WriteBytes(_offset_camreset, GameData.PATCH_CAMRESET_LOCKON_DISABLE);
+                return false;
+            }
+
+            return true;
+        }
+
+        private bool PatchLongAnimations()
+        {
+            if (!cbLongAnimation.IsEnabled || _offset_longanimations == 0x0 || !CanPatchGame()) return false;
+            if (cbLongAnimation.IsChecked == true)
+            {
+                WriteBytes(_offset_longanimations, GameData.PATCH_LONGANIMATION);
+            } 
+            else if (cbLongAnimation.IsChecked == false)
+            {
+                WriteBytes(_offset_longanimations, _patch_longanimation_disable);
                 return false;
             }
 

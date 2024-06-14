@@ -8,8 +8,7 @@ namespace EldenRingFPSUnlockAndMore
         internal const string PROCESS_DESCRIPTION = "elden";
         internal static readonly string[] PROCESS_EXE_VERSION_SUPPORTED = new string[]
         {
-            "1.2.0.0",
-            "1.2.1.0"
+            "2.0.1.0"
         };
 
         /**
@@ -22,7 +21,7 @@ namespace EldenRingFPSUnlockAndMore
 
             00007FF6AEA0EF5F (Version 1.2.0.0)
          */
-        internal const string PATTERN_FRAMELOCK = "C7 ?? ?? ?? 88 88 3C EB"; // first byte can can be 88/90 instead of 89 due to precision loss on floating point numbers
+        internal const string PATTERN_FRAMELOCK = "C7 ?? ?? 89 88 3C EB"; // first byte can can be 88/90 instead of 89 due to precision loss on floating point numbers
         internal const int PATTERN_FRAMELOCK_OFFSET = 3; // offset to byte array from found position
         internal const string PATTERN_FRAMELOCK_FUZZY = "89 73 ?? C7 ?? ?? ?? ?? ?? ?? EB ?? 89 73";
         internal const int PATTERN_FRAMELOCK_OFFSET_FUZZY = 6;
@@ -66,8 +65,8 @@ namespace EldenRingFPSUnlockAndMore
             00007FF7A30C8D80 | 74 39                      | je eldenring.7FF7A30C8DBB                                      |
             00007FF7A30C8D82 | 41:8BD3                    | mov edx,r11d                                                   |
          */
-        internal const string PATTERN_RESOLUTION_SCALING_FIX = "8B ?? 85 ?? 74 ?? 44 8B ?? ?? 45 85 ?? 74 ?? 41 8B";
-        internal const int PATTERN_RESOLUTION_SCALING_FIX_OFFSET = 4;
+        internal const string PATTERN_RESOLUTION_SCALING_FIX = "48 C7 45 B8 FE FF FF FF 48 89 58 10 48 89 70 18 48 89 78 20 0F 29 70 C8 48 8B";
+        internal const int PATTERN_RESOLUTION_SCALING_FIX_OFFSET = 148;
         internal static readonly byte[] PATCH_RESOLUTION_SCALING_FIX_ENABLE = new byte[] { 0xEB };  // jmp
         internal static readonly byte[] PATCH_RESOLUTION_SCALING_FIX_DISABLE = new byte[] { 0x74 }; // je
 
@@ -159,5 +158,12 @@ namespace EldenRingFPSUnlockAndMore
         internal const int PATTERN_CAMRESET_LOCKON_OFFSET = 7;
         internal static readonly byte[] PATCH_CAMRESET_LOCKON_ENABLE = new byte[1] { 0xEB }; // jmp
         internal static readonly byte[] PATCH_CAMRESET_LOCKON_DISABLE = new byte[1] { 0x74 }; // je
+
+
+        internal const string PATTERN_LONGANIMATION_LOCKON = "C7 ?? ?? ?? 01 00 00 00 F3 ?? 0F 10 ?? ?? ?? F3 ?? 0F 10 ?? ?? ?? F3 0F 59 ?? ?? ?? ?? ?? ?? 0F 28 ?? F3 ?? 0F 5C ?? ?? 58";
+        internal const int PATTERN_LONGANIMATION_LOCKON_OFFSET = 72;
+        internal const int PATCH_LONGANIMATION_INSTRUCTION_LENGTH = 7;
+        internal static readonly byte[] PATCH_LONGANIMATION = new byte[] { 0x0F ,0x57 ,0xc9 ,0x90 ,0x90 ,0x90 ,0x90 };
+
     }
 }
