@@ -189,5 +189,17 @@ namespace EldenRingFPSUnlockAndMore.Properties {
                 this["LongAnimations"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AutoStartTicked {
+            get {
+                return ((bool)(this["AutoStartTicked"]));
+            }
+            set {
+                this["AutoStartTicked"] = value;
+            }
+        }
     }
 }
